@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="hu">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,69 +10,80 @@
       padding: 0;
       height: 100%;
       overflow: hidden;
-    }.background-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-}
+    }
 
-.background-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  transition: opacity 2s ease;
-  background-color: #000000;
-  will-change: opacity, transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-}
+    .background-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+    }
 
-.background-slide.active {
-  opacity: 1;
-  z-index: 1;
-  animation: background-move 15s ease-in-out infinite alternate;
-}
+    .background-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-color: #000;
+      opacity: 0;
+      transition: opacity 2s ease;
+      will-change: opacity;
+      backface-visibility: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-@keyframes background-move {
-  0% {
-    transform: scale(1.05) translateY(0px);
-  }
-  100% {
-    transform: scale(1.1) translateY(-20px);
-  }
-}
+    .background-slide.active {
+      opacity: 1;
+      z-index: 2;
+      animation: background-move 15s ease-in-out infinite alternate;
+    }
 
-@media (max-width: 768px) {
-  .background-slide {
-    animation: none !important;
-    transform: none !important;
-  }
-}
+    @keyframes background-move {
+      0% {
+        transform: scale(1.05) translateY(0px);
+      }
+      100% {
+        transform: scale(1.1) translateY(-20px);
+      }
+    }
 
+    /* Mobilon ne animáljon transformot, de az opacity maradjon */
+    @media (max-width: 768px) {
+      .background-slide {
+        animation: none !important;
+        transform: none !important;
+      }
+    }
   </style>
 </head>
 <body>
+
   <div class="background-container">
     <div class="background-slide" id="slide1"></div>
     <div class="background-slide" id="slide2"></div>
-  </div>  <script>
+  </div>
+
+  <script>
     async function loadConfig() {
       const response = await fetch("config.json");
       return await response.json();
     }
 
-    function preloadImages(images) {
-      images.forEach(img => {
-        const i = new Image();
-        i.src = img.url;
+    function preloadImages(images, callback) {
+      let loaded = 0;
+      images.forEach((img) => {
+        const image = new Image();
+        image.onload = () => {
+          loaded++;
+          if (loaded === images.length) callback();
+        };
+        image.src = img.url;
       });
     }
 
@@ -87,7 +99,7 @@
       let currentIndex = 0;
       let activeSlide = 0;
 
-      // Inicializálás
+      // Kezdőkép beállítása
       slides[0].style.backgroundImage = `url('${images[currentIndex].url}')`;
       slides[0].classList.add("active");
       slides[1].style.backgroundImage = `url('${images[(currentIndex + 1) % images.length].url}')`;
@@ -105,17 +117,20 @@
       }, duration);
     }
 
+    // Konfiguráció betöltése és slider indítása
     loadConfig().then(config => {
       const isMobile = window.innerWidth < 768;
       const selectedImages = config.background.mobileImages && isMobile
         ? config.background.mobileImages
         : config.background.images;
 
-      preloadImages(selectedImages);
-      startBackgroundSlider({
-        images: selectedImages,
-        duration: config.background.duration || 8
+      preloadImages(selectedImages, () => {
+        startBackgroundSlider({
+          images: selectedImages,
+          duration: config.background.duration || 8
+        });
       });
     });
-  </script></body>
+  </script>
+</body>
 </html>
