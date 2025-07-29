@@ -42,28 +42,47 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
-            /* JAVÍTVA: A transform és opacity animációra való felkészítés */
-            will-change: opacity, transform;
-            transition: opacity 1.5s ease-in-out;
-            /* JAVÍTVA: Az alapértelmezett állapot a skálázás miatt */
-            transform: scale(1.05); /* Enyhe alap zoom, hogy a nagyítás során ne látszódjon a kép széle */
+            /* JAVÍTÁS: Hardveres gyorsítás előkészítése a transform és opacity tulajdonságokra */
+            will-change: transform, opacity;
+            /* A két kép közötti áttűnés ideje */
+            transition: opacity 2s ease-in-out; 
+            /* JAVÍTÁS: A képeket alapból felnagyítjuk, hogy a mozgás során ne látszódjon a szélük */
+            transform: scale(1.1);
         }
 
         .background-slide.active {
             opacity: 1;
-            /* JAVÍTVA: A teljesítménybarát animáció itt van alkalmazva */
-            animation: ken-burns-effekt 10s ease-in-out infinite alternate;
         }
 
-        /* JAVÍTVA: A régi "bg-move" helyett egy új, "transform"-ot használó animáció */
-        @keyframes ken-burns-effekt {
+        /* JAVÍTÁS: A régi "bg-move" helyett két, finoman eltérő "Ken Burns" effektet hozunk létre */
+        @keyframes ken-burns-1 {
             from {
-                transform: scale(1.05);
+                transform: scale(1.1) translate(0, 0);
             }
             to {
-                transform: scale(1.2);
+                transform: scale(1.2) translate(2%, -1%);
             }
         }
+
+        @keyframes ken-burns-2 {
+            from {
+                transform: scale(1.2) translate(-2%, 1%);
+            }
+            to {
+                transform: scale(1.1) translate(0, 0);
+            }
+        }
+        
+        /* JAVÍTÁS: Az animációkat közvetlenül a slide elemekre tesszük, hogy folyamatosan fussanak a háttérben */
+        .background-slide:nth-child(1) {
+            /* Hosszabb animációs idő a finomabb mozgásért, az 'alternate' pedig oda-vissza játssza le */
+            animation: ken-burns-1 20s ease-in-out infinite alternate;
+        }
+
+        .background-slide:nth-child(2) {
+            animation: ken-burns-2 20s ease-in-out infinite alternate;
+        }
+
 
         /* ========== BETÖLTÉSI ANIMÁCIÓ ========== */
         .animated-onload {
@@ -136,6 +155,7 @@
             z-index: 3;
         }
 
+
         /* ========== KONTÉNER ========== */
         .container {
             display: flex;
@@ -173,6 +193,7 @@
             transform: translateY(-2px) scale(0.98);
              box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3), 0 0 25px rgba(0, 0, 0, 0.15);
         }
+
 
         /* ========== ÜVEG RÉTEGEK ========== */
         .glass-filter {
@@ -342,7 +363,7 @@
         function startBackgroundSlider(backgroundConfig) {
             const slides = document.querySelectorAll('.background-slide');
             const images = backgroundConfig.images;
-            const transitionTime = backgroundConfig.transition || 1500;
+            const transitionTime = backgroundConfig.transition || 2000; /* Növelheted az áttűnés idejét, ha a CSS-ben is növelted */
             const duration = backgroundConfig.duration || 8000;
 
             if (images.length === 0 || slides.length < 2) {
@@ -355,10 +376,6 @@
 
             slides.forEach(slide => {
                 slide.style.transition = `opacity ${transitionTime / 1000}s ease-in-out`;
-                /* A CSS animáció időtartamát is beállíthatjuk a JS-ből, ha dinamikusnak kell lennie */
-                if (slide.classList.contains('active')) {
-                    slide.style.animationDuration = `${duration / 1000 * 1.25}s`; /* A 10s-os animációt a duration-höz igazítjuk */
-                }
             });
 
             let currentIndex = 0;
