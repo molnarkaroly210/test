@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- JAVÍTÁS: Gyorsítótár tiltása meta tagekkel -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <title>Dobos János</title>
     <style>
         :root {
@@ -24,7 +30,7 @@
             background-color: #000;
         }
 
-        /* ========== HÁTTÉR ANIMÁCIÓ (JAVÍTVA) ========== */
+        /* ========== HÁTTÉR ANIMÁCIÓ ========== */
         #background-container {
             position: fixed;
             top: 0;
@@ -42,11 +48,8 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
-            /* JAVÍTÁS: Hardveres gyorsítás előkészítése a transform és opacity tulajdonságokra */
             will-change: transform, opacity;
-            /* A két kép közötti áttűnés ideje */
-            transition: opacity 2s ease-in-out; 
-            /* JAVÍTÁS: A képeket alapból felnagyítjuk, hogy a mozgás során ne látszódjon a szélük */
+            transition: opacity 2s ease-in-out;
             transform: scale(1.1);
         }
 
@@ -54,7 +57,6 @@
             opacity: 1;
         }
 
-        /* JAVÍTÁS: A régi "bg-move" helyett két, finoman eltérő "Ken Burns" effektet hozunk létre */
         @keyframes ken-burns-1 {
             from {
                 transform: scale(1.1) translate(0, 0);
@@ -73,9 +75,7 @@
             }
         }
         
-        /* JAVÍTÁS: Az animációkat közvetlenül a slide elemekre tesszük, hogy folyamatosan fussanak a háttérben */
         .background-slide:nth-child(1) {
-            /* Hosszabb animációs idő a finomabb mozgásért, az 'alternate' pedig oda-vissza játssza le */
             animation: ken-burns-1 20s ease-in-out infinite alternate;
         }
 
@@ -299,7 +299,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const configUrl = 'assets/config.json';
+            // JAVÍTÁS: "Cache busting" a config.json fájlra
+            const configUrl = `assets/config.json?v=${new Date().getTime()}`;
 
             fetch(configUrl)
                 .then(response => {
@@ -363,7 +364,7 @@
         function startBackgroundSlider(backgroundConfig) {
             const slides = document.querySelectorAll('.background-slide');
             const images = backgroundConfig.images;
-            const transitionTime = backgroundConfig.transition || 2000; /* Növelheted az áttűnés idejét, ha a CSS-ben is növelted */
+            const transitionTime = backgroundConfig.transition || 2000;
             const duration = backgroundConfig.duration || 8000;
 
             if (images.length === 0 || slides.length < 2) {
