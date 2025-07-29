@@ -42,22 +42,26 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
+            /* JAVÍTVA: A transform és opacity animációra való felkészítés */
+            will-change: opacity, transform;
             transition: opacity 1.5s ease-in-out;
-            /* ITT TÖRTÉNT A VÁLTOZÁS: Visszaállítva az eredeti mozgás-animáció */
-            animation: bg-move 10s ease-in-out infinite alternate;
+            /* JAVÍTVA: Az alapértelmezett állapot a skálázás miatt */
+            transform: scale(1.05); /* Enyhe alap zoom, hogy a nagyítás során ne látszódjon a kép széle */
         }
 
         .background-slide.active {
             opacity: 1;
+            /* JAVÍTVA: A teljesítménybarát animáció itt van alkalmazva */
+            animation: ken-burns-effekt 10s ease-in-out infinite alternate;
         }
 
-        /* ITT TÖRTÉNT A VÁLTOZÁS: Ez az eredeti animáció kulcskockája */
-        @keyframes bg-move {
+        /* JAVÍTVA: A régi "bg-move" helyett egy új, "transform"-ot használó animáció */
+        @keyframes ken-burns-effekt {
             from {
-                background-position: center center;
+                transform: scale(1.05);
             }
             to {
-                background-position: center top;
+                transform: scale(1.2);
             }
         }
 
@@ -122,7 +126,6 @@
                 text-align: center;
             }
         }
-
         
         .name-text {
             font-size: 1.9rem;
@@ -132,7 +135,6 @@
             color: var(--lg-text);
             z-index: 3;
         }
-
 
         /* ========== KONTÉNER ========== */
         .container {
@@ -171,7 +173,6 @@
             transform: translateY(-2px) scale(0.98);
              box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3), 0 0 25px rgba(0, 0, 0, 0.15);
         }
-
 
         /* ========== ÜVEG RÉTEGEK ========== */
         .glass-filter {
@@ -354,6 +355,10 @@
 
             slides.forEach(slide => {
                 slide.style.transition = `opacity ${transitionTime / 1000}s ease-in-out`;
+                /* A CSS animáció időtartamát is beállíthatjuk a JS-ből, ha dinamikusnak kell lennie */
+                if (slide.classList.contains('active')) {
+                    slide.style.animationDuration = `${duration / 1000 * 1.25}s`; /* A 10s-os animációt a duration-höz igazítjuk */
+                }
             });
 
             let currentIndex = 0;
