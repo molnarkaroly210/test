@@ -3,12 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- JAVÍTÁS: Gyorsítótár tiltása meta tagekkel -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
     <title>Dobos János</title>
     <style>
         :root {
@@ -30,7 +24,7 @@
             background-color: #000;
         }
 
-        /* ========== HÁTTÉR ANIMÁCIÓ ========== */
+        /* ========== HÁTTÉR ANIMÁCIÓ (JAVÍTVA) ========== */
         #background-container {
             position: fixed;
             top: 0;
@@ -48,41 +42,24 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
-            will-change: transform, opacity;
-            transition: opacity 2s ease-in-out;
-            transform: scale(1.1);
+            transition: opacity 1.5s ease-in-out;
+            /* ITT TÖRTÉNT A VÁLTOZÁS: Visszaállítva az eredeti mozgás-animáció */
+            animation: bg-move 10s ease-in-out infinite alternate;
         }
 
         .background-slide.active {
             opacity: 1;
         }
 
-        @keyframes ken-burns-1 {
+        /* ITT TÖRTÉNT A VÁLTOZÁS: Ez az eredeti animáció kulcskockája */
+        @keyframes bg-move {
             from {
-                transform: scale(1.1) translate(0, 0);
+                background-position: center center;
             }
             to {
-                transform: scale(1.2) translate(2%, -1%);
+                background-position: center top;
             }
         }
-
-        @keyframes ken-burns-2 {
-            from {
-                transform: scale(1.2) translate(-2%, 1%);
-            }
-            to {
-                transform: scale(1.1) translate(0, 0);
-            }
-        }
-        
-        .background-slide:nth-child(1) {
-            animation: ken-burns-1 20s ease-in-out infinite alternate;
-        }
-
-        .background-slide:nth-child(2) {
-            animation: ken-burns-2 20s ease-in-out infinite alternate;
-        }
-
 
         /* ========== BETÖLTÉSI ANIMÁCIÓ ========== */
         .animated-onload {
@@ -145,7 +122,7 @@
                 text-align: center;
             }
         }
-        
+
         .name-text {
             font-size: 1.9rem;
             font-weight: 700;
@@ -299,8 +276,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // JAVÍTÁS: "Cache busting" a config.json fájlra
-            const configUrl = `assets/config.json?v=${new Date().getTime()}`;
+            const configUrl = 'assets/config.json';
 
             fetch(configUrl)
                 .then(response => {
@@ -364,7 +340,7 @@
         function startBackgroundSlider(backgroundConfig) {
             const slides = document.querySelectorAll('.background-slide');
             const images = backgroundConfig.images;
-            const transitionTime = backgroundConfig.transition || 2000;
+            const transitionTime = backgroundConfig.transition || 1500;
             const duration = backgroundConfig.duration || 8000;
 
             if (images.length === 0 || slides.length < 2) {
